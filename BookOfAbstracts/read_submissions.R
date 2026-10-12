@@ -57,6 +57,148 @@ clean_text <- function(x) {
   trimws(x)
 }
 
+clean_md <- function(x) {
+  x <- trimws(x)
+  whole_bold <- grepl("^\\*\\*.*\\*\\*$", x)
+  x[whole_bold] <- sub("^\\*\\*(.*)\\*\\*$", "\\1", x[whole_bold])
+  x <- gsub("\\\\\\*", "*", x)
+  x <- gsub("\\\\-", "-", x)
+  x <- gsub("\\\\\\.", ".", x)
+  x <- gsub("\\\\\\|", "|", x)
+  x <- gsub("\\*\\*", "", x)
+  trimws(x)
+}
+
+normalize_title <- function(x) {
+  x <- clean_md(x)
+  x <- sub("^Keynote:\\s*", "", x, ignore.case = TRUE)
+  x <- gsub("[\u2018\u2019\u201c\u201d]", "", x)
+  x <- sub("\\s+[-\u2013\u2014]\\s+(i|ii|iii|iv|v)\\s*$", "", x, ignore.case = TRUE)
+  x <- gsub("\\x{00A0}", " ", x, perl = TRUE)
+  x <- iconv(x, from = "UTF-8", to = "ASCII//TRANSLIT")
+  x <- gsub("[[:punct:]]+", " ", x)
+  x <- gsub("[[:space:]]+", " ", x)
+  trimws(tolower(x))
+}
+
+split_people <- function(x) {
+  if (is.na(x) || !nzchar(trimws(x))) {
+    return(character())
+  }
+  people <- trimws(strsplit(x, ",", fixed = TRUE)[[1]])
+  people[nzchar(people)]
+}
+
+normalize_person <- function(x) {
+  x <- gsub("\\x{00A0}", " ", x, perl = TRUE)
+  x <- iconv(x, from = "UTF-8", to = "ASCII//TRANSLIT")
+  x <- gsub("\\([^)]*\\)", "", x)
+  x <- gsub("[[:punct:]]+", " ", x)
+  x <- gsub("[[:space:]]+", " ", x)
+  trimws(tolower(x))
+}
+
+person_match_keys <- function(x) {
+  normalized <- normalize_person(x)
+  if (!nzchar(normalized)) {
+    return(character())
+  }
+  words <- strsplit(normalized, " ", fixed = TRUE)[[1]]
+  words <- words[nzchar(words)]
+  unique(c(normalized, paste(sort(words), collapse = " ")))
+}
+
+extract_programme_entry <- function(cell) {
+  cell <- trimws(cell)
+  cell <- sub("^\\s*(?:[-*]|[0-9]+\\.)\\s+", "", cell, perl = TRUE)
+  match <- regexec("^\\*\\*(.*?)\\*\\*\\s*-\\s*(.*?)\\s*$", cell, perl = TRUE)
+  parts <- regmatches(cell, match)[[1]]
+  if (length(parts) != 3L) {
+    return(NULL)
+  }
+
+  title <- clean_md(parts[[2]])
+  authors <- clean_md(parts[[3]])
+  authors <- sub("\\s*\\(chair:\\s*.*\\)\\s*$", "", authors, ignore.case = TRUE)
+  authors <- gsub("[[:space:]]+", " ", authors)
+  authors <- trimws(authors)
+
+  if (!nzchar(title) || !nzchar(authors)) {
+    return(NULL)
+  }
+
+  list(title = title, authors = authors)
+}
+
+load_programme_author_lookup <- function(programme_file = "README.md") {
+  lookup <- new.env(parent = emptyenv())
+  if (!file.exists(programme_file)) {
+    return(lookup)
+  }
+
+  lines <- readLines(programme_file, warn = FALSE, encoding = "UTF-8")
+  for (line in lines) {
+    cells <- if (grepl("^\\s*\\|", line)) {
+      strsplit(line, "\\|", perl = TRUE)[[1]]
+    } else {
+      line
+    }
+
+    for (cell in cells) {
+      entry <- extract_programme_entry(cell)
+      if (is.null(entry)) {
+        next
+      }
+
+      key <- normalize_title(entry$title)
+      if (nzchar(key)) {
+        assign(key, entry$authors, envir = lookup)
+      }
+    }
+  }
+
+  lookup
+}
+
+programme_authors <- function(title, fallback, lookup) {
+  key <- normalize_title(title)
+  if (nzchar(key) && exists(key, lookup, inherits = FALSE)) {
+    get(key, lookup, inherits = FALSE)
+  } else {
+    fallback
+  }
+}
+
+match_people_to_reference <- function(people, reference) {
+  people <- split_people(people)
+  reference <- split_people(reference)
+  if (!length(people) || !length(reference)) {
+    return(paste(people, collapse = ", "))
+  }
+
+  matched <- vapply(
+    people,
+    function(person) {
+      person_keys <- person_match_keys(person)
+      hits <- vapply(
+        reference,
+        function(ref_person) {
+          any(person_match_keys(ref_person) %in% person_keys)
+        },
+        logical(1)
+      )
+      if (any(hits)) {
+        reference[[which(hits)[[1]]]]
+      } else {
+        person
+      }
+    },
+    character(1)
+  )
+
+  paste(matched, collapse = ", ")
+}
+
 abstracts <- fread("submissions_uRos.csv")
 colnames(abstracts) <- c(colnames(abstracts)[-1], "V1")
 accepted_emos_docids <- c(
@@ -107,9 +249,23 @@ abstracts[, Authors := clean_people(Authors)]
 abstracts[, LABOS := clean_text(LABOS)]
 abstracts[, TITLE := clean_text(TITLE)]
 abstracts[, ABSTRACT := clean_text(ABSTRACT)]
+programme_lookup <- load_programme_author_lookup()
+abstracts[, Authors := mapply(
+  programme_authors,
+  TITLE,
+  Authors,
+  MoreArgs = list(lookup = programme_lookup),
+  USE.NAMES = FALSE
+)]
+abstracts[, SPEAKERS := mapply(
+  match_people_to_reference,
+  SPEAKERS,
+  Authors,
+  USE.NAMES = FALSE
+)]
 keynotes <- data.table(
-  SPEAKERS = c("Couch Simon", "Killick Rebecca", "Alexandru Ciprian"),
-  Authors = c("Couch Simon", "Killick Rebecca", "Alexandru Ciprian"),
+  SPEAKERS = c("Simon Couch", "Rebecca Killick", "Ciprian Alexandru"),
+  Authors = c("Simon Couch", "Rebecca Killick", "Ciprian Alexandru"),
   LABOS = c(
     "Posit PBC",
     "Clemson University",

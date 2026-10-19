@@ -1,7 +1,7 @@
 
 ## Tidy Survey Analysis in R: Working with Weights and Sampling Designs for Official Statistics
 
-This short, hands-on tutorial will get you started in tidy survey analysis in R using the {srvyr} package. We will us motivating examples from the European Social Survey to introduce survey design objects, descriptive analysis, and data dissemination.
+This short, hands-on tutorial will get you started in tidy survey analysis in R using the {srvyr} package. We will use motivating examples from the European Social Survey to introduce survey design objects, descriptive analysis, and data dissemination.
 
 [Back to program page](../README.md)
 

@@ -10,3 +10,5 @@ lightning/B2/dummy2.pdf
 lightning/B2/dummy3.pdf
 submissions_uRos_old.csv
 email*.csv
+BookOfAbstracts/excluded_accepted.csv
+BookOfAbstracts/review_issues.csv

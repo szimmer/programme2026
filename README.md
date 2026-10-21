@@ -65,7 +65,6 @@
 - **Bridging R and Python for AI-Driven NLP** - Georgios Lykos, Spyridon Dimas, Georgia Panagopoulou, Michail Vikentios
 - **Structuring Annual Reports for Official Statistics: A Method for Data Editing Using Large Language Models** - Bjørkholt Solveig, Mona Islam Mousumi, Sarah Torvholm Frøystad, Odin Johansen, Maryam Javed
 - **A Comparison of Model-Based and Unsupervised Learning Methods for Detecting Scaling Errors in R** - Marcello D'orazio, Cristina Faricelli, Renato Magistro
-- **Unsupervised Learning Approaches for Identifying Structural Anomalies in European Regional Statistics** - Bogdan Oancea
 
 ### B2 - Lightning Talks I: Production, Validation and Survey Methods
 
@@ -73,7 +72,7 @@
 2. **Template and Function: A Tabular Configuration Pattern for Large Scale Operations on Files with Varying Schemas in Official Statistics** - Daniel Rakotomalala
 3. **R you useful for maintaining information systems?** - Alice Mainguené
 4. **{IssueTrackeR}: Handling Tickets in R** - Tanguy Barthelemy
-5. **From Data to Publication : An Automated R-Based Framework for Consumer Price Index Reporting** - Zineb Aoulad Hammou Achou, ZakariaeHalhal
+5. **From Data to Publication : An Automated R-Based Framework for Consumer Price Index Reporting** - Zineb Aoulad Hammou Achou, Zakariae Halhal
 6. **Facilitating R-Based Statistical Validation Through EZR: A Case Study in Melanoma High-Frequency Ultrasound Assessment** - Kyrylo Chalyy, Roman Hryshchenko, Olga Bogomolets, Viktor Stepanenko
 7. **Manual Rework Volume Monitoring and Forecasting Tool** - Yves Coltier
 8. **Semi-automated editing of large volumes of foreign trade data for the environmental Economy-Wide Material Flow Account** - Gorka Campandegui García, Julia Maestro López
@@ -174,7 +173,7 @@
 2. **ILSAmerge and ILSAstats: Two new R packages for international large-scale assessments** - Andrés Christiansen
 3. **{loomer} - A high-performance auxiliary R package for analyzing the Danish Lifelines dataset** - Ilya Kashnitsky
 4. **Further microdata anonymisation tools in R** - Marco Caputi
-5. **Automatic classification of pastoral-use parcels / Classification automatique des parcelles Ã usage pastoral** - Romuald Thion
+5. **Automatic classification of pastoral-use parcels / Classification automatique des parcelles à usage pastoral** - Romuald Thion
 6. **Use of R Packages for Cartography: The Case of Road Traffic Accident Statistics in Luxembourg** - Guillaume Osier, Alexi Dere, Lucile Bodson
 7. **Mapping the Gendered Impact of Economic Shocks: A Spatial Analysis of Mancession vs. Shecession across European Regions** - Andreea-Denisa Trascan, Camelia-Maria Dan
 8. **One R, Many Stories: R as a Visual Language to Tell a Country's Public Health Narrative** - Jerico Bajador

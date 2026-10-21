@@ -73,7 +73,12 @@ normalize_title <- function(x) {
   x <- clean_md(x)
   x <- sub("^Keynote:\\s*", "", x, ignore.case = TRUE)
   x <- gsub("[\u2018\u2019\u201c\u201d]", "", x)
-  x <- sub("\\s+[-\u2013\u2014]\\s+(i|ii|iii|iv|v)\\s*$", "", x, ignore.case = TRUE)
+  x <- sub(
+    "\\s+[-\u2013\u2014]\\s+(i|ii|iii|iv|v)\\s*$",
+    "",
+    x,
+    ignore.case = TRUE
+  )
   x <- gsub("\\x{00A0}", " ", x, perl = TRUE)
   x <- iconv(x, from = "UTF-8", to = "ASCII//TRANSLIT")
   x <- gsub("[[:punct:]]+", " ", x)
@@ -199,8 +204,18 @@ match_people_to_reference <- function(people, reference) {
   paste(matched, collapse = ", ")
 }
 
-abstracts <- fread("submissions_uRos.csv")
-colnames(abstracts) <- c(colnames(abstracts)[-1], "V1")
+# The export has an unnamed trailing field. Read its actual header explicitly.
+header <- names(fread(
+  text = readLines("submissions_uRos.csv", n = 1L),
+  header = TRUE
+))
+abstracts <- fread("submissions_uRos.csv", skip = 1L, header = FALSE)
+stopifnot(ncol(abstracts) %in% c(length(header), length(header) + 1L))
+setnames(
+  abstracts,
+  c(header, if (ncol(abstracts) > length(header)) "EXPORT_EXTRA")
+)
+submissions <- copy(abstracts)
 accepted_emos_docids <- c(
   "757980",
   "754557",
@@ -227,7 +242,8 @@ excluded_docids <- c(
   "752081",
   "752605",
   "752408",
-  "748022"
+  "748022",
+  "736812"
 )
 abstracts <- abstracts[
   STATUT == "Accepted" &
@@ -235,6 +251,7 @@ abstracts <- abstracts[
     (TYPDOC != "EMOS session" |
       (TYPDOC == "EMOS session" & DOCID %in% accepted_emos_docids)),
   .(
+    DOCID = as.character(DOCID),
     SPEAKERS,
     Authors = AUTHORS,
     LABOS,
@@ -250,20 +267,47 @@ abstracts[, LABOS := clean_text(LABOS)]
 abstracts[, TITLE := clean_text(TITLE)]
 abstracts[, ABSTRACT := clean_text(ABSTRACT)]
 programme_lookup <- load_programme_author_lookup()
-abstracts[, Authors := mapply(
-  programme_authors,
-  TITLE,
-  Authors,
-  MoreArgs = list(lookup = programme_lookup),
-  USE.NAMES = FALSE
-)]
-abstracts[, SPEAKERS := mapply(
-  match_people_to_reference,
-  SPEAKERS,
-  Authors,
-  USE.NAMES = FALSE
-)]
+# Keep submitted co-authors and their affiliation references. Programme names
+# supply spelling/order, but must never replace the complete submitted list.
+merge_authors <- function(title, submitted) {
+  reference <- split_people(programme_authors(title, "", programme_lookup))
+  original <- split_people(submitted)
+  used <- rep(FALSE, length(original))
+  result <- vapply(
+    reference,
+    function(person) {
+      hits <- which(vapply(
+        original,
+        function(author) {
+          any(person_match_keys(author) %in% person_match_keys(person))
+        },
+        logical(1)
+      ))
+      if (length(hits) == 1L) {
+        used[hits] <<- TRUE
+        refs <- regmatches(
+          original[hits],
+          gregexpr("\\([0-9]+\\)", original[hits])
+        )[[1]]
+        return(trimws(paste(person, paste(refs, collapse = " "))))
+      }
+      person
+    },
+    character(1)
+  )
+  paste(c(result, original[!used]), collapse = ", ")
+}
+abstracts[, Authors := mapply(merge_authors, TITLE, Authors, USE.NAMES = FALSE)]
+abstracts[,
+  SPEAKERS := mapply(
+    match_people_to_reference,
+    SPEAKERS,
+    Authors,
+    USE.NAMES = FALSE
+  )
+]
 keynotes <- data.table(
+  DOCID = c("invited-couch", "invited-killick", "invited-alexandru"),
   SPEAKERS = c("Simon Couch", "Rebecca Killick", "Ciprian Alexandru"),
   Authors = c("Simon Couch", "Rebecca Killick", "Ciprian Alexandru"),
   LABOS = c(
@@ -305,4 +349,6 @@ fwrite(
   file = "emailEMOS.csv"
 )
 abstracts[, Email := NULL]
-fwrite(rbind(abstracts, keynotes), file = "abstracts.csv")
+abstracts <- rbind(abstracts, keynotes)
+fwrite(abstracts, file = "abstracts.csv")
+source("BookOfAbstracts/review_submissions.R")

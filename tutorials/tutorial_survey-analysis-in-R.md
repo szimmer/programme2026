@@ -27,7 +27,6 @@ The following topics will be treated:
 
 - Introduction to European Social Survey
 - Creating survey design objects
-- Data cleaning
 - Descriptive analysis
 - Creating publishable graphs and maps
 

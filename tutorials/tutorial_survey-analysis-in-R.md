@@ -1,11 +1,7 @@
 
-## Title
+## Tidy Survey Analysis in R: Working with Weights and Sampling Designs for Official Statistics
 
-_short inviting text, for example:_
-
-This short, hands-on tutorial will get you started with the latest and most
-advanced time series models in R.
-
+This short, hands-on tutorial will get you started in tidy survey analysis in R using the {srvyr} package. We will use motivating examples from the European Social Survey to introduce survey design objects, descriptive analysis, and data dissemination.
 
 [Back to program page](../README.md)
 
@@ -14,49 +10,36 @@ advanced time series models in R.
 
 |Item     |entry |
 |---------|------|
-|Presentor(s) |  |
+|Presenters | Stephanie Zimmer, Rebecca Powell, Isabella Velásquez |
 |Duration |90:00 |
-|Materials|[course materials](https://mywebsite.com/uroscourse.zip)|
-
-
-
+|Materials|[course materials](https://tidy-survey-r.github.io/uros-2026-tutorial/)|
 
 ### Learning Goals
 
-One or a few sentences of what you will know or able to do, after following this course.
+After this course, participants will be able to:
 
-After this course, participants will...
-
-- understand x
-- be able to do y
-
+- specify sampling designs in the {srvyr} package
+- conduct descriptive analysis on survey data
 
 ### Course contents
 
-The following topics will be treated
+The following topics will be treated:
 
-- topic 1
-- topic 2 
-
+- Introduction to European Social Survey
+- Creating survey design objects
+- Descriptive analysis
+- Creating publishable graphs and maps
 
 ### Target audience
 
-What should a participating member already know?
-
-We expect participants to have a working knowledge of base R, and RStudio projects.
-Furthermore, some experience with time series objects, including `ts` objects is recommendable. 
-
+For the best learning experience, we recommend you have some prior experience with R and the {tidyverse}, including familiarity with `mutate`, `summarize`, `count`, and `group_by`.
 
 ### Before coming to the course
 
-Please make sure you have installed R and RStudio and have the latest versions
-of the following packages installed:
+Review the {tidyverse} functions mentioned above, if necessary.
 
-- package1
-- package2
+We will be using Posit Cloud, so you do not need to have R or RStudio installed on your computer. 
 
-(possible other software needed)
+However, if you want to use your own computer, you will need R installed as well as the packages {tidyverse}, {sf}, {gt}, {srvyr}, {tmap}, {usethis}, {glue}, and {arrow}. Additionally, create an account at the [ESS Data Portal](https://ess.sikt.no/en/register?redirectUrl=/en/) and then get your [user ID](https://ess.sikt.no/en/api).
 
-Please download the [course materials](https://mywebsite.com/uroscourse.zip).
-
-
+Please download the [course materials](https://github.com/tidy-survey-r/uros-2026-tutorial).

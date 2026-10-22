@@ -14,7 +14,7 @@ The various concepts and tools will be illustrated through practical application
 
 | Item         | Entry                                                                  |
 | ------------ | ---------------------------------------------------------------------- |
-| Presenter(s) | [Kim Antunez](https://github/antuki)                                   |
+| Presenter(s) | [Kim Antunez](https://github.com/antuki)                                   |
 | Duration     | 90:00                                                                  |
 | Materials    | [Course materials](https://antuki.github.io/uros2026_spatialanalysis/) |
 
